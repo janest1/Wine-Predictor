@@ -1,4 +1,4 @@
-### Wine Predictor ###
+## Wine Predictor
 
 A simple feed-forward neural network classifier for wine varieties based on user-submitted descriptions.  Trained on the [Wine Reviews Dataset](https://www.kaggle.com/zynicide/wine-reviews) from Kaggle and implemented in Tensorflow.  Model details: multi-layer perceptron with one hidden layer of size 200.  Trained using softmax cross-entropy loss with Adam Optimizer on minibatches of size 100.
 
@@ -10,7 +10,7 @@ To train the model and predict wine varieties for the test data, run **wine_pred
 
 **To do:** write precision, recall, F1 evaluation script
 
-## Cheers! ##
+### Cheers!
 
 <pre>
                 __
