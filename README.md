@@ -10,7 +10,7 @@ To train the model and predict wine varieties for the test data, run **wine_pred
 
 **To do:** write precision, recall, F1 evaluation script
 
-##Cheers!##
+## Cheers! ##
 
 <pre>
                 __
