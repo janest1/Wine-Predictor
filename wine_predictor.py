@@ -13,7 +13,7 @@ import numpy as np
 import csv
 
 
-def main(train_input, dev_input, test_input, train_senses, dev_senses):
+def main(train_input, dev_input, test_input, train_labels, dev_labels):
     """Build neural network architecture, feed in data and train model using dev set to evaluate cross-entropy loss.
     Run trained model on test set."""
 
@@ -24,7 +24,7 @@ def main(train_input, dev_input, test_input, train_senses, dev_senses):
     batch_size = 100
     hidden_size_1 = 200
     # hidden_size_2 = 25
-    output_size = len(train_senses[0])
+    output_size = len(train_labels[0])
 
     # build MLP neural network architecture (symbolic)
     print('...building the neural network...')
@@ -66,33 +66,37 @@ def main(train_input, dev_input, test_input, train_senses, dev_senses):
     sess.run(tf.global_variables_initializer())
 
     converged = False
-    iteration = 0
+    epochs = 0
     prev_dev_loss_value = 0
     converge_count = 0
     while not converged:
+        # loop through all minibatches in training set
         for i in range(int(len(train_input) / batch_size)):
             sess.run(
                 train_step,
                 feed_dict={
                     x: train_input[i * batch_size:(i + 1) * batch_size],
-                    gold_y: train_senses[i * batch_size:(i + 1) * batch_size]})
+                    gold_y: train_labels[i * batch_size:(i + 1) * batch_size]})
 
-        iteration += 1
+        epochs += 1
 
         # calculate loss on dev set after traversing all minibatches
+        train_loss = tf.reduce_sum(cross_entropy)
+        train_loss_value = sess.run(train_loss, feed_dict={x: train_input, gold_y: train_labels})
         dev_loss = tf.reduce_sum(cross_entropy)
         dev_loss_value = sess.run(dev_loss,
-            feed_dict={x: dev_input, gold_y: dev_senses})
+            feed_dict={x: dev_input, gold_y: dev_labels})
+        print('iteration {}, loss on train: {}'.format(epochs, train_loss_value))
 
-        if iteration % 10 == 0:
-            print('iteration: ', iteration, ', loss on dev:', dev_loss_value)
-            results_file.write(str(iteration) + '\t' + str(dev_loss_value) + '\n')
+        if epochs % 10 == 0:
+            print('iteration {}, loss on dev: {}'.format(epochs, dev_loss_value))
+            results_file.write(str(epochs) + '\t' + str(dev_loss_value) + '\n')
 
         # convergence check
         if dev_loss_value >= prev_dev_loss_value:
             converge_count += 1
-            print(converge_count)
-            if converge_count >= 15:
+            # print(converge_count)
+            if converge_count >= 30:
                 converged = True
                 print('...training has converged...')
         else:
@@ -123,6 +127,7 @@ if __name__ == '__main__':
             test_labels = np.load(f6)
 
         results = main(train_input, dev_input, test_input, train_labels, dev_labels)
+        print(results)
 
         # TODO output a csv that looks like the test set but with predicted labels, and have a separate scorer script
 
